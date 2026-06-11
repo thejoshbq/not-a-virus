@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Official Gift Disbursement Notice — Form RR-87</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=Titan+One&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #FAF7F0;
+    --ink: #1B2A4A;
+    --stamp: #C8102E;
+    --highlight: #FFD23F;
+    --party: #FF4D8D;
+    --party-2: #4DC9FF;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'IBM Plex Mono', monospace;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 31px, rgba(27,42,74,0.05) 31px, rgba(27,42,74,0.05) 32px);
+  }
+
+  /* ---------- STAGE 1: the bureaucratic form ---------- */
+  .form-card {
+    max-width: 560px;
+    width: 100%;
+    border: 3px solid var(--ink);
+    background: var(--paper);
+    box-shadow: 8px 8px 0 var(--ink);
+    padding: 36px 32px;
+    position: relative;
+  }
+  .form-card::before {
+    content: "VOID IF NOT BELLA";
+    position: absolute;
+    top: 12px;
+    right: -38px;
+    transform: rotate(38deg);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--stamp);
+    border: 2px solid var(--stamp);
+    padding: 3px 30px;
+    opacity: 0.85;
+    background: var(--paper);
+  }
+  .dept {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 10px;
+    margin-bottom: 18px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(22px, 5vw, 30px);
+    line-height: 1.15;
+    margin-bottom: 18px;
+    text-transform: uppercase;
+  }
+  .field {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px dashed rgba(27,42,74,0.4);
+    font-size: 14px;
+  }
+  .field b { font-weight: 700; }
+  .field .val { text-align: right; }
+  .certified {
+    margin: 22px 0;
+    padding: 12px 14px;
+    background: var(--highlight);
+    border: 2px solid var(--ink);
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .claim-btn {
+    width: 100%;
+    border: 3px solid var(--ink);
+    background: var(--stamp);
+    color: var(--paper);
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 18px;
+    cursor: pointer;
+    box-shadow: 5px 5px 0 var(--ink);
+    transition: transform 0.08s ease, box-shadow 0.08s ease;
+  }
+  .claim-btn:hover { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 var(--ink); }
+  .claim-btn:active { transform: translate(3px, 3px); box-shadow: 2px 2px 0 var(--ink); }
+  .claim-btn:focus-visible { outline: 3px dashed var(--ink); outline-offset: 4px; }
+  .fine-print {
+    margin-top: 14px;
+    font-size: 10px;
+    line-height: 1.6;
+    opacity: 0.7;
+  }
+
+  /* ---------- STAGE 2: processing ---------- */
+  .processing { display: none; text-align: center; max-width: 560px; width: 100%; }
+  .processing .status {
+    font-size: 16px;
+    min-height: 28px;
+    margin-bottom: 22px;
+  }
+  .bar {
+    border: 3px solid var(--ink);
+    height: 32px;
+    background: var(--paper);
+    box-shadow: 5px 5px 0 var(--ink);
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    width: 0%;
+    background: repeating-linear-gradient(45deg, var(--stamp), var(--stamp) 12px, var(--highlight) 12px, var(--highlight) 24px);
+    transition: width 0.6s ease;
+  }
+
+  /* ---------- STAGE 3: the reveal ---------- */
+  .reveal { display: none; text-align: center; max-width: 760px; width: 100%; }
+  .reveal h2 {
+    font-family: 'Titan One', cursive;
+    font-size: clamp(34px, 9vw, 76px);
+    line-height: 1.05;
+    color: var(--party);
+    text-shadow: 4px 4px 0 var(--ink);
+    margin-bottom: 8px;
+    animation: bounceIn 0.7s cubic-bezier(.18,1.6,.4,1) both;
+  }
+  .reveal .subline {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: clamp(15px, 3vw, 20px);
+    margin-bottom: 20px;
+    animation: bounceIn 0.7s 0.15s cubic-bezier(.18,1.6,.4,1) both;
+  }
+  .video-frame {
+    border: 4px solid var(--ink);
+    box-shadow: 8px 8px 0 var(--party-2);
+    aspect-ratio: 16 / 9;
+    width: 100%;
+    background: #000;
+    animation: bounceIn 0.7s 0.3s cubic-bezier(.18,1.6,.4,1) both;
+  }
+  .video-frame iframe { width: 100%; height: 100%; border: 0; display: block; }
+  .gotcha {
+    margin-top: 18px;
+    font-size: 13px;
+    animation: bounceIn 0.7s 0.45s cubic-bezier(.18,1.6,.4,1) both;
+  }
+  @keyframes bounceIn {
+    from { opacity: 0; transform: scale(0.6) translateY(30px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  /* confetti */
+  .confetti {
+    position: fixed;
+    top: -20px;
+    width: 10px;
+    height: 16px;
+    z-index: 999;
+    animation: fall linear forwards;
+  }
+  @keyframes fall {
+    to { transform: translateY(110vh) rotate(720deg); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal h2, .reveal .subline, .video-frame, .gotcha { animation: none; }
+    .confetti { display: none; }
+    .claim-btn { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- STAGE 1 -->
+  <main class="form-card" id="stage1">
+    <div class="dept"><span>Dept. of Birthday Affairs</span><span>Form RR-87</span></div>
+    <h1>Official Gift Disbursement Notice</h1>
+    <div class="field"><b>Recipient:</b> <span class="val">BELLA</span></div>
+    <div class="field"><b>Occasion:</b> <span class="val">Birthday (annual, recurring)</span></div>
+    <div class="field"><b>Gift status:</b> <span class="val">HELD AT FACILITY</span></div>
+    <div class="field"><b>Gift contents:</b> <span class="val">[REDACTED]</span></div>
+    <div class="field"><b>Rickroll probability:</b> <span class="val">0.00%*</span></div>
+    <div class="certified">⚠ This page has been independently certified 100% Rickroll-Free by the Bureau of Internet Trust (est. 1987).</div>
+    <button class="claim-btn" id="claimBtn" onclick="startClaim()">Claim Your Gift</button>
+    <p class="fine-print">*Margin of error: 100%. By clicking, recipient agrees to never be given up, let down, run around, or deserted. The Department is not liable for songs stuck in heads for up to 72 hours.</p>
+  </main>
+
+  <!-- STAGE 2 -->
+  <div class="processing" id="stage2">
+    <p class="status" id="statusText">Verifying birthday status…</p>
+    <div class="bar"><div class="bar-fill" id="barFill"></div></div>
+  </div>
+
+  <!-- STAGE 3 -->
+  <div class="reveal" id="stage3">
+    <h2>HAPPY BIRTHDAY<br>BELLA! 🎂</h2>
+    <p class="subline">Your gift: you just got rickrolled. We're never gonna give you up. ❤️</p>
+    <div class="video-frame">
+      <iframe id="rickFrame" title="Your official birthday gift"
+        src="" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+    </div>
+    <p class="gotcha">Filed under: Form RR-87 · Claim approved · No refunds, only vibes 🎉</p>
+  </div>
+
+<script>
+  const steps = [
+    "Verifying birthday status… ✅ confirmed, it's Bella",
+    "Authenticating cake eligibility… ✅ approved",
+    "Notarizing balloon permit… ✅ stamped",
+    "Consulting Rick from Accounting… 🤔",
+    "Disbursing gift…"
+  ];
+
+  function startClaim() {
+    document.getElementById('stage1').style.display = 'none';
+    const stage2 = document.getElementById('stage2');
+    stage2.style.display = 'block';
+    const statusText = document.getElementById('statusText');
+    const barFill = document.getElementById('barFill');
+
+    let i = 0;
+    statusText.textContent = steps[0];
+    barFill.style.width = '15%';
+
+    const timer = setInterval(() => {
+      i++;
+      if (i < steps.length) {
+        statusText.textContent = steps[i];
+        barFill.style.width = (15 + i * 21) + '%';
+      } else {
+        clearInterval(timer);
+        barFill.style.width = '100%';
+        setTimeout(revealGift, 500);
+      }
+    }, 1100);
+  }
+
+  function revealGift() {
+    document.getElementById('stage2').style.display = 'none';
+    const stage3 = document.getElementById('stage3');
+    stage3.style.display = 'block';
+    // Autoplay is permitted here because it follows the user's click
+    document.getElementById('rickFrame').src =
+      'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?autoplay=1&rel=0';
+    launchConfetti();
+  }
+
+  function launchConfetti() {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const colors = ['#FF4D8D', '#4DC9FF', '#FFD23F', '#C8102E', '#1B2A4A'];
+    for (let i = 0; i < 120; i++) {
+      const c = document.createElement('div');
+      c.className = 'confetti';
+      c.style.left = Math.random() * 100 + 'vw';
+      c.style.background = colors[Math.floor(Math.random() * colors.length)];
+      c.style.animationDuration = (2.5 + Math.random() * 3) + 's';
+      c.style.animationDelay = (Math.random() * 2) + 's';
+      c.style.transform = 'rotate(' + Math.random() * 360 + 'deg)';
+      document.body.appendChild(c);
+      setTimeout(() => c.remove(), 8000);
+    }
+  }
+</script>
+</body>
+</html>
