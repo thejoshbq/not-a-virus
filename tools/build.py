@@ -161,7 +161,10 @@ def tracked_plaintext() -> list[str]:
         )
     except (OSError, subprocess.CalledProcessError):
         return []
-    return [ln for ln in res.stdout.splitlines() if ln.strip()]
+    return [
+        ln for ln in res.stdout.splitlines()
+        if ln.strip() and not Path(ln).name.startswith("_")
+    ]
 
 
 # --------------------------------------------------------------------------- commands
