@@ -10,17 +10,20 @@ function youtubeId(media) {
 const css = `
   #act-root { min-height: 100vh; background: #000; color: #7CFF6B; font-family: 'IBM Plex Mono', monospace;
     padding: 0; display: flex; flex-direction: column; overflow: hidden; }
-  .vx-hijack { position: fixed; inset: 0; z-index: 9999; background: #000; color: #fff;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    text-align: center; padding: 24px; cursor: none; }
-  .vx-hijack.flash { background: #9b0000; }
-  .vx-hijack.bsod { background: #0078d7; }
-  .vx-hijack h1 { font-family: 'Space Grotesk', sans-serif; font-size: clamp(28px, 9vw, 72px);
-    letter-spacing: 2px; text-transform: uppercase; line-height: 0.95; text-shadow: 0 0 18px #ff2a2a; }
-  .vx-hijack .vx-subh { margin-top: 14px; font-size: clamp(13px, 3vw, 18px); letter-spacing: 3px;
-    text-transform: uppercase; opacity: 0.9; }
-  .vx-hijack .vx-wipe { margin-top: 28px; font-size: 13px; letter-spacing: 1px; opacity: 0.75; }
-  .vx-shake { animation: vxshake 0.08s linear infinite; }
+  .vx-hijack { position: fixed; inset: 0; z-index: 9999; background: #0078d7; color: #fff;
+    display: flex; flex-direction: column; align-items: flex-start; justify-content: center;
+    text-align: left; padding: 10vh 8vw; cursor: none; font-family: 'Segoe UI', 'Space Grotesk', sans-serif; }
+  .vx-hijack.flash { background: #c40000; align-items: center; justify-content: center; text-align: center; }
+  .vx-hijack.black { background: #000; }
+  .vx-hijack.white { background: #fff; color: #000; }
+  .vx-face { font-size: clamp(72px, 20vw, 160px); line-height: 0.9; font-weight: 300; margin: 0; }
+  .vx-bsod-copy { font-size: clamp(16px, 3.2vw, 28px); max-width: 22em; margin-top: 18px; font-weight: 400;
+    letter-spacing: 0; text-transform: none; line-height: 1.35; }
+  .vx-pct { margin-top: 28px; font-size: clamp(16px, 3vw, 24px); }
+  .vx-stop { margin-top: 36px; font-size: 13px; opacity: 0.85; font-family: 'IBM Plex Mono', monospace; }
+  .vx-hijack.flash h1 { font-family: 'Space Grotesk', sans-serif; font-size: clamp(36px, 11vw, 88px);
+    letter-spacing: 2px; text-transform: uppercase; line-height: 0.95; margin: 0; }
+  .vx-shake { animation: vxshake 0.07s linear infinite; }
   @keyframes vxshake {
     0% { transform: translate(0,0); }
     25% { transform: translate(-6px, 3px); }
@@ -76,24 +79,36 @@ function reduced() {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
-function scream() {
+function scream(kind) {
   try {
     const ctx = window.__tone || new (window.AudioContext || window.webkitAudioContext)();
     window.__tone = ctx;
     const now = ctx.currentTime;
     const master = ctx.createGain();
     master.gain.setValueAtTime(0.0001, now);
-    master.gain.exponentialRampToValueAtTime(0.22, now + 0.02);
-    master.gain.exponentialRampToValueAtTime(0.0001, now + 0.55);
     master.connect(ctx.destination);
-    [110, 220, 932, 1480].forEach((freq, i) => {
+    if (kind === 'beep') {
+      master.gain.exponentialRampToValueAtTime(0.18, now + 0.01);
+      master.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
+      const o = ctx.createOscillator();
+      o.type = 'square';
+      o.frequency.setValueAtTime(880, now);
+      o.frequency.setValueAtTime(440, now + 0.12);
+      o.connect(master);
+      o.start(now);
+      o.stop(now + 0.35);
+      return;
+    }
+    master.gain.exponentialRampToValueAtTime(0.28, now + 0.01);
+    master.gain.exponentialRampToValueAtTime(0.0001, now + 1.05);
+    [55, 110, 740, 1760, 2100].forEach((freq, i) => {
       const o = ctx.createOscillator();
       o.type = i < 2 ? 'sawtooth' : 'square';
       o.frequency.setValueAtTime(freq, now);
-      o.frequency.exponentialRampToValueAtTime(freq * (i % 2 ? 1.8 : 0.5), now + 0.45);
+      o.frequency.exponentialRampToValueAtTime(freq * (i % 2 ? 2.2 : 0.4), now + 0.9);
       o.connect(master);
       o.start(now);
-      o.stop(now + 0.55);
+      o.stop(now + 1.05);
     });
   } catch { /* autoplay policies, older browsers */ }
 }
@@ -152,63 +167,79 @@ function hijack(root, name, then) {
   const overlay = document.createElement('div');
   overlay.className = 'vx-hijack';
   overlay.setAttribute('role', 'alert');
-  const h1 = document.createElement('h1');
-  h1.className = 'vx-glitch';
-  h1.textContent = 'SYSTEM COMPROMISED';
-  const sub = document.createElement('div');
-  sub.className = 'vx-subh';
-  sub.textContent = 'UNAUTHORIZED PROCESS HAS TAKEN THIS DISPLAY';
-  const wipe = document.createElement('div');
-  wipe.className = 'vx-wipe';
-  wipe.textContent = 'encrypting user files… 0%';
-  overlay.append(h1, sub, wipe);
+
+  const face = document.createElement('div');
+  face.className = 'vx-face';
+  face.textContent = ':(';
+  const copy = document.createElement('div');
+  copy.className = 'vx-bsod-copy';
+  copy.textContent = 'Your PC ran into a problem and needs to restart. We\'re just collecting some error info, and then you can restart.';
+  const pct = document.createElement('div');
+  pct.className = 'vx-pct';
+  pct.textContent = '0% complete';
+  const stop = document.createElement('div');
+  stop.className = 'vx-stop';
+  stop.textContent = `Stop code: BIRTHDAY_OVERFLOW  ·  What failed: ${name.toUpperCase()}.SYS`;
+  overlay.append(face, copy, pct, stop);
   root.appendChild(overlay);
 
   document.documentElement.requestFullscreen?.().catch(() => {});
   document.body.style.cursor = 'none';
 
-  if (reduced()) {
+  const finish = () => {
     overlay.remove();
     document.body.style.cursor = '';
     then();
+  };
+
+  if (reduced()) {
+    pct.textContent = '100% complete';
+    setTimeout(finish, 900);
     return;
   }
 
-  scream();
-  overlay.classList.add('flash', 'vx-shake');
+  scream('beep');
 
-  const files = [
-    `C:\\\\Users\\\\${name}\\\\Documents\\\\thesis_FINAL_v9.docx`,
-    `C:\\\\Users\\\\${name}\\\\Desktop\\\\passwords.txt`,
-    'C:\\\\Windows\\\\System32\\\\hal.dll',
-    'C:\\\\Users\\\\Public\\\\definitely_not_a_birthday.exe'
+  let complete = 0;
+  const crawl = setInterval(() => {
+    complete = Math.min(37, complete + 7);
+    pct.textContent = complete + '% complete';
+    if (complete >= 37) clearInterval(crawl);
+  }, 140);
+
+  const death = [
+    { cls: 'black', wait: 80 },
+    { cls: 'flash vx-shake', wait: 140, scream: true, title: 'FATAL' },
+    { cls: 'white', wait: 90 },
+    { cls: 'flash', wait: 120, title: 'KERNEL PANIC' },
+    { cls: 'black', wait: 70 },
+    { cls: 'flash vx-shake', wait: 160, title: 'DO NOT RESTART' },
+    { cls: 'white', wait: 80 },
+    { cls: 'black', wait: 100 },
+    { cls: 'flash', wait: 220, title: 'WAIT' }
   ];
-  let n = 0;
-  const timer = setInterval(() => {
-    n++;
-    overlay.classList.toggle('flash');
-    overlay.classList.toggle('bsod', n === 2);
-    if (n === 2) {
-      h1.textContent = 'DO NOT TURN OFF YOUR COMPUTER';
-      sub.textContent = 'kernel panic  ·  display hijacked  ·  wait—';
-    }
-    if (n === 4) {
-      overlay.classList.remove('bsod');
-      overlay.classList.add('flash');
-      h1.textContent = 'WAIT';
-      sub.textContent = 'this payload is… festive?';
-    }
-    wipe.textContent = `encrypting  ${files[n % files.length]}   ${Math.min(99, n * 24)}%`;
-    if (n >= 6) {
-      clearInterval(timer);
-      overlay.remove();
-      document.body.style.cursor = '';
-      then();
-    }
-  }, 420);
+
+  setTimeout(() => {
+    clearInterval(crawl);
+    overlay.innerHTML = '';
+    const h1 = document.createElement('h1');
+    overlay.appendChild(h1);
+    let i = 0;
+    const step = () => {
+      if (i >= death.length) { finish(); return; }
+      const d = death[i++];
+      overlay.className = 'vx-hijack ' + d.cls;
+      h1.textContent = d.title || '';
+      if (d.scream) scream('death');
+      setTimeout(step, d.wait);
+    };
+    step();
+  }, 1600);
 }
 
 function render(root, p) {
+  document.body.style.background = '#0078d7';
+  document.documentElement.style.background = '#0078d7';
   const name = String(p.name || 'Recipient');
   const headline = p.headline || `HAPPY BIRTHDAY ${name.toUpperCase()}`;
   const subline = p.subline || 'Threat contained. Payload is a card. Mostly.';
