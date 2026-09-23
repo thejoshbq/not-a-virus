@@ -37,7 +37,7 @@ function render(root, p) {
   const ticker = document.createElement('div');
   ticker.className = 'bc-ticker';
   const tick = document.createElement('span');
-  tick.textContent = `  ● LIVE  ·  Dept. of Birthday Affairs  ·  ${name}  ·  Form RR-87  ·  do not adjust your set  ·  `;
+  tick.textContent = p.ticker || `  ● LIVE  ·  Dept. of Special Occasions  ·  ${name}  ·  Form RR-87  ·  do not adjust your set  ·  `;
   ticker.appendChild(tick);
 
   const stage = document.createElement('div');
@@ -66,7 +66,7 @@ function render(root, p) {
     const wrap = document.createElement('div');
     wrap.className = 'bc-video';
     const iframe = document.createElement('iframe');
-    iframe.title = 'Birthday broadcast';
+    iframe.title = p.media_title || 'Official broadcast';
     iframe.allow = 'autoplay; encrypted-media; picture-in-picture';
     iframe.allowFullscreen = true;
     iframe.src = `https://www.youtube-nocookie.com/embed/${ytid}?autoplay=1&rel=0`;

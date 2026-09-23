@@ -34,7 +34,7 @@ const css = `
     background: #FAF7F0; color: #1B2A4A; font-family: 'IBM Plex Mono', monospace;
     background-image: repeating-linear-gradient(0deg, transparent, transparent 31px, rgba(27,42,74,0.05) 31px, rgba(27,42,74,0.05) 32px); }
   .rr-card { max-width: 560px; width: 100%; border: 3px solid #1B2A4A; background: #FAF7F0; box-shadow: 8px 8px 0 #1B2A4A; padding: 36px 32px; position: relative; }
-  .rr-card::before { content: "VOID IF NOT RECIPIENT"; position: absolute; top: 12px; right: -38px; transform: rotate(38deg); font-size: 11px; font-weight: 700; letter-spacing: 2px; color: #C8102E; border: 2px solid #C8102E; padding: 3px 18px; opacity: 0.85; background: #FAF7F0; }
+  .rr-card::before { content: attr(data-stamp); position: absolute; top: 12px; right: -38px; transform: rotate(38deg); font-size: 11px; font-weight: 700; letter-spacing: 2px; color: #C8102E; border: 2px solid #C8102E; padding: 3px 18px; opacity: 0.85; background: #FAF7F0; }
   .rr-dept { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; border-bottom: 2px solid #1B2A4A; padding-bottom: 10px; margin-bottom: 18px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px; }
   .rr-card h1 { font-family: 'Space Grotesk', sans-serif; font-size: clamp(22px, 5vw, 30px); line-height: 1.15; margin-bottom: 18px; text-transform: uppercase; }
   .rr-field { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px dashed rgba(27,42,74,0.4); font-size: 14px; }
@@ -92,19 +92,31 @@ function render(root, p) {
       ];
   const ytid = youtubeId(p.media);
   const paras = Array.isArray(p.message) ? p.message : [];
+  const dept = p.dept || 'Dept. of Birthday Affairs';
+  const formId = p.form_id || 'Form RR-87';
+  const title = p.title || 'Official Gift Disbursement Notice';
+  const stamp = p.stamp || 'VOID IF NOT RECIPIENT';
+  const occasion = p.occasion || 'Birthday (annual, recurring)';
+  const status = p.status || 'HELD AT FACILITY';
+  const contents = p.contents || '[REDACTED]';
+  const extraLabel = p.extra_label || 'Rickroll probability:';
+  const extraValue = p.extra_value || '0.00%*';
+  const certified = p.certified || '⚠ This page has been independently certified 100% Rickroll-Free by the Bureau of Internet Trust (est. 1987).';
+  const button = p.button || 'Claim Your Gift';
+  const fine = p.fine || '*Margin of error: 100%. By clicking, recipient agrees to never be given up, let down, run around, or deserted. The Department is not liable for songs stuck in heads for up to 72 hours.';
 
   root.innerHTML = `
-    <main class="rr-card" id="rr-s1">
-      <div class="rr-dept"><span>Dept. of Birthday Affairs</span><span>Form RR-87</span></div>
-      <h1>Official Gift Disbursement Notice</h1>
+    <main class="rr-card" id="rr-s1" data-stamp="">
+      <div class="rr-dept"><span id="rr-dept"></span><span id="rr-formid"></span></div>
+      <h1 id="rr-title"></h1>
       <div class="rr-field"><b>Recipient:</b> <span class="val" id="rr-name"></span></div>
-      <div class="rr-field"><b>Occasion:</b> <span class="val">Birthday (annual, recurring)</span></div>
-      <div class="rr-field"><b>Gift status:</b> <span class="val">HELD AT FACILITY</span></div>
-      <div class="rr-field"><b>Gift contents:</b> <span class="val">[REDACTED]</span></div>
-      <div class="rr-field"><b>Rickroll probability:</b> <span class="val">0.00%*</span></div>
-      <div class="rr-certified">⚠ This page has been independently certified 100% Rickroll-Free by the Bureau of Internet Trust (est. 1987).</div>
-      <button class="rr-btn" id="rr-claim" type="button">Claim Your Gift</button>
-      <p class="rr-fine">*Margin of error: 100%. By clicking, recipient agrees to never be given up, let down, run around, or deserted. The Department is not liable for songs stuck in heads for up to 72 hours.</p>
+      <div class="rr-field"><b>Occasion:</b> <span class="val" id="rr-occasion"></span></div>
+      <div class="rr-field"><b>Status:</b> <span class="val" id="rr-status-val"></span></div>
+      <div class="rr-field"><b>Contents:</b> <span class="val" id="rr-contents"></span></div>
+      <div class="rr-field"><b id="rr-extra-label"></b> <span class="val" id="rr-extra-val"></span></div>
+      <div class="rr-certified" id="rr-certified"></div>
+      <button class="rr-btn" id="rr-claim" type="button"></button>
+      <p class="rr-fine" id="rr-fine"></p>
     </main>
     <div class="rr-proc" id="rr-s2">
       <p class="rr-status" id="rr-status"></p>
@@ -118,7 +130,19 @@ function render(root, p) {
       <p class="rr-gotcha" id="rr-foot"></p>
     </div>
   `;
+  root.querySelector('#rr-s1').setAttribute('data-stamp', stamp);
+  root.querySelector('#rr-dept').textContent = dept;
+  root.querySelector('#rr-formid').textContent = formId;
+  root.querySelector('#rr-title').textContent = title;
   root.querySelector('#rr-name').textContent = name.toUpperCase();
+  root.querySelector('#rr-occasion').textContent = occasion;
+  root.querySelector('#rr-status-val').textContent = status;
+  root.querySelector('#rr-contents').textContent = contents;
+  root.querySelector('#rr-extra-label').textContent = extraLabel;
+  root.querySelector('#rr-extra-val').textContent = extraValue;
+  root.querySelector('#rr-certified').textContent = certified;
+  root.querySelector('#rr-claim').textContent = button;
+  root.querySelector('#rr-fine').textContent = fine;
 
   const head = root.querySelector('#rr-head');
   // headline may contain a single intentional <br> from the author; everything else is text.
