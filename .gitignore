@@ -1,0 +1,10 @@
+# Plaintext birthday pages. The published site only ever sees vault.json.
+content/*.json
+!content/_example.json
+
+# Local scratch
+.DS_Store
+*.pyc
+__pycache__/
+.venv/
+venv/

@@ -1,0 +1,13 @@
+{
+  "name": "Example Person",
+  "passcode": "example-only-do-not-use",
+  "act": "form-rr87",
+  "headline": "HAPPY BIRTHDAY EXAMPLE!",
+  "subline": "Your gift: you just got rickrolled. We're never gonna give you up.",
+  "message": [
+    "This file is a shape reference. Copy it with: python3 tools/build.py --new 'Their Name'",
+    "Then edit content/<slug>.json and rebuild vault.json."
+  ],
+  "media": { "type": "youtube", "id": "dQw4w9WgXcQ" },
+  "footer": "Filed under Form RR-87 · Claim approved · No refunds, only vibes"
+}
