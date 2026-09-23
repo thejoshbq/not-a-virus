@@ -1,4 +1,5 @@
-// Act: Virus — fake scareware / OtisDefender screen. Looks infected. Does nothing.
+// Act: Virus — short hijack / jump-scare, then a fake scareware birthday.
+// Looks infected. Does nothing. Not malware.
 
 function youtubeId(media) {
   if (!media || media.type !== 'youtube') return null;
@@ -7,13 +8,37 @@ function youtubeId(media) {
 }
 
 const css = `
-  #act-root { min-height: 100vh; background: #010204; color: #7CFF6B; font-family: 'IBM Plex Mono', monospace;
+  #act-root { min-height: 100vh; background: #000; color: #7CFF6B; font-family: 'IBM Plex Mono', monospace;
     padding: 0; display: flex; flex-direction: column; overflow: hidden; }
+  .vx-hijack { position: fixed; inset: 0; z-index: 9999; background: #000; color: #fff;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 24px; cursor: none; }
+  .vx-hijack.flash { background: #9b0000; }
+  .vx-hijack.bsod { background: #0078d7; }
+  .vx-hijack h1 { font-family: 'Space Grotesk', sans-serif; font-size: clamp(28px, 9vw, 72px);
+    letter-spacing: 2px; text-transform: uppercase; line-height: 0.95; text-shadow: 0 0 18px #ff2a2a; }
+  .vx-hijack .vx-subh { margin-top: 14px; font-size: clamp(13px, 3vw, 18px); letter-spacing: 3px;
+    text-transform: uppercase; opacity: 0.9; }
+  .vx-hijack .vx-wipe { margin-top: 28px; font-size: 13px; letter-spacing: 1px; opacity: 0.75; }
+  .vx-shake { animation: vxshake 0.08s linear infinite; }
+  @keyframes vxshake {
+    0% { transform: translate(0,0); }
+    25% { transform: translate(-6px, 3px); }
+    50% { transform: translate(5px, -4px); }
+    75% { transform: translate(-3px, 5px); }
+    100% { transform: translate(4px, -2px); }
+  }
+  .vx-glitch { animation: vxglitch 0.12s steps(2) infinite; }
+  @keyframes vxglitch {
+    0% { clip-path: inset(0 0 40% 0); transform: translate(-4px, 0); }
+    50% { clip-path: inset(30% 0 10% 0); transform: translate(4px, 0); }
+    100% { clip-path: inset(10% 0 50% 0); transform: translate(-2px, 0); }
+  }
   .vx-scanlines { pointer-events: none; position: fixed; inset: 0; z-index: 50;
-    background: repeating-linear-gradient(0deg, rgba(0,0,0,0.18) 0 1px, transparent 1px 3px); }
+    background: repeating-linear-gradient(0deg, rgba(0,0,0,0.22) 0 1px, transparent 1px 3px); }
   .vx-bar { background: #8B0000; color: #fff; font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
     padding: 8px 14px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-  .vx-bar b { animation: vxblink 1s step-end infinite; }
+  .vx-bar b { animation: vxblink 0.6s step-end infinite; }
   @keyframes vxblink { 50% { opacity: 0; } }
   .vx-stage { flex: 1; padding: 18px 16px 28px; max-width: 860px; width: 100%; margin: 0 auto; }
   .vx-win { border: 2px solid #7CFF6B; background: #07140a; box-shadow: 0 0 24px rgba(124,255,107,0.18); }
@@ -23,7 +48,6 @@ const css = `
   .vx-alert { color: #ff4d4d; font-weight: 700; font-size: clamp(16px, 4vw, 22px); margin-bottom: 12px;
     text-transform: uppercase; }
   .vx-log { font-size: 13px; line-height: 1.7; min-height: 8em; white-space: pre-wrap; }
-  .vx-log .dim { color: #3a7a34; }
   .vx-bargraph { margin: 14px 0 6px; height: 18px; border: 1px solid #7CFF6B; }
   .vx-bargraph > div { height: 100%; width: 0; background: repeating-linear-gradient(90deg, #7CFF6B, #7CFF6B 8px, #010204 8px, #010204 12px);
     transition: width 0.4s linear; }
@@ -40,15 +64,42 @@ const css = `
   .vx-pop .hd { background: #000080; color: #fff; font-size: 12px; padding: 4px 8px; font-weight: 700; }
   .vx-pop .bd { padding: 12px; font-size: 13px; }
   .vx-pop button { font-family: inherit; border: 2px solid #000; background: #c0c0c0; padding: 4px 14px; cursor: pointer; }
+  .vx-main { display: none; flex: 1; flex-direction: column; }
+  .vx-main.on { display: flex; }
   @media (prefers-reduced-motion: reduce) {
-    .vx-bar b { animation: none; }
+    .vx-bar b, .vx-shake, .vx-glitch { animation: none; }
     .vx-bargraph > div { transition: none; }
   }
 `;
 
+function reduced() {
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
+function scream() {
+  try {
+    const ctx = window.__tone || new (window.AudioContext || window.webkitAudioContext)();
+    window.__tone = ctx;
+    const now = ctx.currentTime;
+    const master = ctx.createGain();
+    master.gain.setValueAtTime(0.0001, now);
+    master.gain.exponentialRampToValueAtTime(0.22, now + 0.02);
+    master.gain.exponentialRampToValueAtTime(0.0001, now + 0.55);
+    master.connect(ctx.destination);
+    [110, 220, 932, 1480].forEach((freq, i) => {
+      const o = ctx.createOscillator();
+      o.type = i < 2 ? 'sawtooth' : 'square';
+      o.frequency.setValueAtTime(freq, now);
+      o.frequency.exponentialRampToValueAtTime(freq * (i % 2 ? 1.8 : 0.5), now + 0.45);
+      o.connect(master);
+      o.start(now);
+      o.stop(now + 0.55);
+    });
+  } catch { /* autoplay policies, older browsers */ }
+}
+
 function typeLog(el, lines, onDone) {
-  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (reduce) {
+  if (reduced()) {
     el.textContent = lines.join('\n');
     onDone();
     return;
@@ -58,14 +109,14 @@ function typeLog(el, lines, onDone) {
     if (i < lines.length) {
       el.textContent = lines.slice(0, i + 1).join('\n');
       i++;
-      setTimeout(tick, 420);
+      setTimeout(tick, 380);
     } else onDone();
   };
   tick();
 }
 
 function spawnPops(root) {
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (reduced()) return;
   const texts = [
     'ERROR 0xBDAY: cake.dll missing',
     'WARNING: streamer overflow',
@@ -93,8 +144,68 @@ function spawnPops(root) {
       pop.append(hd, bd);
       root.appendChild(pop);
       setTimeout(() => pop.remove(), 8000);
-    }, 600 + n * 500);
+    }, 600 + n * 400);
   });
+}
+
+function hijack(root, name, then) {
+  const overlay = document.createElement('div');
+  overlay.className = 'vx-hijack';
+  overlay.setAttribute('role', 'alert');
+  const h1 = document.createElement('h1');
+  h1.className = 'vx-glitch';
+  h1.textContent = 'SYSTEM COMPROMISED';
+  const sub = document.createElement('div');
+  sub.className = 'vx-subh';
+  sub.textContent = 'UNAUTHORIZED PROCESS HAS TAKEN THIS DISPLAY';
+  const wipe = document.createElement('div');
+  wipe.className = 'vx-wipe';
+  wipe.textContent = 'encrypting user files… 0%';
+  overlay.append(h1, sub, wipe);
+  root.appendChild(overlay);
+
+  document.documentElement.requestFullscreen?.().catch(() => {});
+  document.body.style.cursor = 'none';
+
+  if (reduced()) {
+    overlay.remove();
+    document.body.style.cursor = '';
+    then();
+    return;
+  }
+
+  scream();
+  overlay.classList.add('flash', 'vx-shake');
+
+  const files = [
+    `C:\\\\Users\\\\${name}\\\\Documents\\\\thesis_FINAL_v9.docx`,
+    `C:\\\\Users\\\\${name}\\\\Desktop\\\\passwords.txt`,
+    'C:\\\\Windows\\\\System32\\\\hal.dll',
+    'C:\\\\Users\\\\Public\\\\definitely_not_a_birthday.exe'
+  ];
+  let n = 0;
+  const timer = setInterval(() => {
+    n++;
+    overlay.classList.toggle('flash');
+    overlay.classList.toggle('bsod', n === 2);
+    if (n === 2) {
+      h1.textContent = 'DO NOT TURN OFF YOUR COMPUTER';
+      sub.textContent = 'kernel panic  ·  display hijacked  ·  wait—';
+    }
+    if (n === 4) {
+      overlay.classList.remove('bsod');
+      overlay.classList.add('flash');
+      h1.textContent = 'WAIT';
+      sub.textContent = 'this payload is… festive?';
+    }
+    wipe.textContent = `encrypting  ${files[n % files.length]}   ${Math.min(99, n * 24)}%`;
+    if (n >= 6) {
+      clearInterval(timer);
+      overlay.remove();
+      document.body.style.cursor = '';
+      then();
+    }
+  }, 420);
 }
 
 function render(root, p) {
@@ -115,10 +226,11 @@ function render(root, p) {
         '> displaying payload because we have no other move'
       ];
 
+  const main = document.createElement('div');
+  main.className = 'vx-main';
   const bar = document.createElement('div');
   bar.className = 'vx-bar';
   bar.innerHTML = '<span><b>● ALERT</b>  OtisDefender</span><span>DO NOT TURN OFF YOUR COMPUTER (or do. it is a webpage.)</span>';
-
   const stage = document.createElement('div');
   stage.className = 'vx-stage';
   const win = document.createElement('div');
@@ -141,7 +253,8 @@ function render(root, p) {
   const scan = document.createElement('div');
   scan.className = 'vx-scanlines';
   stage.appendChild(win);
-  root.append(bar, stage, scan);
+  main.append(bar, stage);
+  root.append(main, scan);
 
   root.querySelector('#vx-head').textContent = headline;
   root.querySelector('#vx-sub').textContent = subline;
@@ -153,22 +266,24 @@ function render(root, p) {
     msg.appendChild(el);
   });
 
-  const fill = root.querySelector('#vx-fill');
-  let w = 0;
-  const meter = setInterval(() => {
-    w = Math.min(100, w + 8);
-    fill.style.width = w + '%';
-    if (w >= 100) clearInterval(meter);
-  }, 200);
-
-  typeLog(root.querySelector('#vx-log'), lines, () => {
-    root.querySelector('#vx-payload').style.display = 'block';
-    fill.style.width = '100%';
-    spawnPops(root);
-    const frame = root.querySelector('#vx-frame');
-    if (frame && ytid) {
-      frame.src = `https://www.youtube-nocookie.com/embed/${ytid}?autoplay=1&rel=0`;
-    }
+  hijack(root, name, () => {
+    main.classList.add('on');
+    const fill = root.querySelector('#vx-fill');
+    let w = 0;
+    const meter = setInterval(() => {
+      w = Math.min(100, w + 8);
+      fill.style.width = w + '%';
+      if (w >= 100) clearInterval(meter);
+    }, 200);
+    typeLog(root.querySelector('#vx-log'), lines, () => {
+      root.querySelector('#vx-payload').style.display = 'block';
+      fill.style.width = '100%';
+      spawnPops(root);
+      const frame = root.querySelector('#vx-frame');
+      if (frame && ytid) {
+        frame.src = `https://www.youtube-nocookie.com/embed/${ytid}?autoplay=1&rel=0`;
+      }
+    });
   });
 }
 

@@ -244,6 +244,12 @@
 
   form.addEventListener('submit', async (ev) => {
     ev.preventDefault();
+    // Prime audio on the click so a later jump-scare can actually make noise.
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (AC && !window.__tone) window.__tone = new AC();
+      window.__tone?.resume?.();
+    } catch { /* ignore */ }
     const code = input.value;
     if (!normalize(code)) { show('Enter your claim code first.', 'err'); return; }
     btn.disabled = true;
